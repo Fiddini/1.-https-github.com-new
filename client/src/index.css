@@ -1,0 +1,39 @@
+/* eslint-disable */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-medical-950 text-white font-sans antialiased;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-medical-900/50 backdrop-blur-xl border border-medical-700/50;
+  }
+  .glow {
+    @apply shadow-[0_0_40px_rgba(35,142,215,0.3)];
+  }
+  .text-gradient {
+    @apply bg-gradient-to-r from-medical-400 to-accent-400 bg-clip-text text-transparent;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-medical-950;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-medical-700 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-medical-600;
+}

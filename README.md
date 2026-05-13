@@ -1,16 +1,13 @@
-# OTRIS AI - Asisten Pembelajaran Indonesia
+# OTRIS AI ⚖️
+Asisten Pembelajaran AI untuk Kejaksaan RI
 
-AI Assistant untuk Kejaksaan RI. Fullstack app dengan React + Express + Groq + Supabase.
+**Status:** Production Ready v1.0 ✅
 
-## Status: Production Ready ✅
+**Tech Stack:** React + Vite | Express.js | Groq llama-3.3-70b-versatile | Supabase
 
-## Fitur Utama
-- Chat AI real-time menggunakan llama-3.3-70b-versatile
-- Riwayat chat tersimpan di Supabase PostgreSQL
-- Mode "belajar" untuk konteks hukum
-
-## Cara Jalanin
-1. `npm install` 
-2. Buat `.env` isi: GROQ_API_KEY, SUPABASE_URL, SUPABASE_ANON_KEY
-3. Terminal 1: `node server.js` 
-4. Terminal 2: `npm run dev`
+**Setup Cepat:**
+1. npm install
+2. Buat .env: GROQ_API_KEY, SUPABASE_URL, SUPABASE_ANON_KEY
+3. Terminal 1: node server.js
+4. Terminal 2: npm run dev
+5. http://localhost:5174
