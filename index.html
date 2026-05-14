@@ -34,10 +34,10 @@
                     <img src="https://tamale-follow-travesty.ngrok-free.dev/assets/logo-lacita.png" alt="LACITA AI EDU" class="h-10" onerror="this.style.display='none'">
                     <span class="text-xl font-bold text-blue-800">LACITA AI EDU</span>
                 </div>
-                <a href="https://tamale-follow-travesty.ngrok-free.dev" target="_blank" 
+                <button onclick="openDemoModal()"
                    class="bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 px-6 rounded-lg transition-all duration-300 btn-primary">
                     Coba Demo
-                </a>
+                </button>
             </div>
         </div>
     </header>
@@ -171,7 +171,7 @@
                         <div>
                             <h2 class="text-2xl font-bold mb-4 text-blue-900">Kepemilikan Jelas, Siap Diaudit</h2>
                             <p class="text-gray-700 text-lg leading-relaxed">
-                                LACITA AI EDU dikembangkan 100% oleh Hanif Ahdi Fiddini. Status HAKI: Terdaftar No. [ISI_NO_HAKI]. Seluruh source code dan data tersimpan aman.
+                                LACITA AI EDU dikembangkan 100% oleh Hanif Ahdi Fiddini. Status HAKI: Terdaftar No. 082185559557. Seluruh source code dan data tersimpan aman.
                             </p>
                             <div class="mt-6 flex flex-wrap gap-4">
                                 <div class="flex items-center space-x-2 text-sm text-gray-600">
@@ -233,6 +233,20 @@
         </div>
     </section>
 
+    <!-- Demo CTA Section -->
+    <section id="demo" class="py-20 px-4 gradient-hero">
+        <div class="container mx-auto text-center">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Siap Digitalisasi Sekolah Anda?</h2>
+                <p class="text-xl text-blue-100 mb-8">Jadwalkan demo gratis 15 menit bersama tim kami</p>
+                <button onclick="openDemoModal()"
+                   class="bg-white hover:bg-gray-100 text-blue-800 font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105">
+                    Request Demo Sekarang
+                </button>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="bg-blue-900 text-white py-8 px-4">
         <div class="container mx-auto text-center">
@@ -244,6 +258,88 @@
             </p>
         </div>
     </footer>
+
+    <!-- Demo Request Modal -->
+    <div id="demoModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-bold text-blue-900">Request Demo</h3>
+                    <button onclick="closeDemoModal()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <form id="demoForm" onsubmit="submitDemoForm(event)">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Sekolah *</label>
+                            <input type="text" id="schoolName" required
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="Masukkan nama sekolah">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Kepala Sekolah/PIC *</label>
+                            <input type="text" id="picName" required
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="Nama penanggung jawab">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nomor WhatsApp *</label>
+                            <input type="tel" id="whatsappNumber" required
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="08xxxxxxxxxx">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                            <input type="email" id="email" required
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="email@sekolah.com">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Jumlah Siswa</label>
+                            <select id="studentCount"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="<100">&lt; 100 siswa</option>
+                                <option value="100-500">100 - 500 siswa</option>
+                                <option value="500-1000">500 - 1000 siswa</option>
+                                <option value=">1000">&gt; 1000 siswa</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Preferensi Waktu Demo</label>
+                            <select id="preferredTime"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="Pagi 08-10">Pagi 08-10</option>
+                                <option value="Siang 13-15">Siang 13-15</option>
+                                <option value="Sore 15-17">Sore 15-17</option>
+                                <option value="Fleksibel">Fleksibel</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Catatan Tambahan</label>
+                            <textarea id="notes" rows="3"
+                                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                      placeholder="Pertanyaan atau kebutuhan khusus (opsional)"></textarea>
+                        </div>
+
+                        <button type="submit"
+                                class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300">
+                            Kirim Request Demo
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <script>
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -257,6 +353,75 @@
                     });
                 }
             });
+        });
+
+        function openDemoModal() {
+            const modal = document.getElementById('demoModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDemoModal() {
+            const modal = document.getElementById('demoModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        function submitDemoForm(event) {
+            event.preventDefault();
+
+            // Get form values
+            const schoolName = document.getElementById('schoolName').value;
+            const picName = document.getElementById('picName').value;
+            const whatsappNumber = document.getElementById('whatsappNumber').value;
+            const email = document.getElementById('email').value;
+            const studentCount = document.getElementById('studentCount').value;
+            const preferredTime = document.getElementById('preferredTime').value;
+            const notes = document.getElementById('notes').value;
+
+            // Format WhatsApp message
+            const message = `Halo Tim OTRIS 👋
+
+Saya mau request demo untuk:
+*Sekolah:* ${schoolName}
+*PIC:* ${picName}
+*WA:* ${whatsappNumber}
+*Email:* ${email}
+*Jumlah Siswa:* ${studentCount}
+*Waktu Demo:* ${preferredTime}
+*Catatan:* ${notes || '-'}
+
+Mohon dihubungi untuk jadwal demo. Terima kasih.`;
+
+            // Encode message and open WhatsApp
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/6282185559557?text=${encodedMessage}`;
+            
+            // Close modal and show alert
+            closeDemoModal();
+            alert('Terima kasih! Tim kami akan hubungi via WhatsApp');
+            
+            // Open WhatsApp
+            window.open(whatsappUrl, '_blank');
+
+            // Reset form
+            document.getElementById('demoForm').reset();
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('demoModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDemoModal();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDemoModal();
+            }
         });
     </script>
 </body>
