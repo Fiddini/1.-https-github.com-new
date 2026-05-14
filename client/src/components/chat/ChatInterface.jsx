@@ -23,7 +23,7 @@ export default function ChatInterface() {
   useEffect(() => {
     const loadHistory = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/history");
+        const response = await fetch("/api/history");
         const data = await response.json();
         
         if (data.history && data.history.length > 0) {
@@ -38,7 +38,7 @@ export default function ChatInterface() {
           setMessages([
             {
               role: "assistant",
-              content: "Halo! Saya OTRIS AI, asisten pembelajaran medis Anda. Bagaimana saya bisa membantu Anda hari ini?",
+              content: "Halo! Saya LACITA AI EDU, teman belajar SMA Riau. Bagaimana saya bisa membantu Anda hari ini?",
             },
           ]);
         }
@@ -47,7 +47,7 @@ export default function ChatInterface() {
         setMessages([
           {
             role: "assistant",
-            content: "Halo! Saya OTRIS AI, asisten pembelajaran medis Anda. Bagaimana saya bisa membantu Anda hari ini?",
+            content: "Halo! Saya LACITA AI EDU, teman belajar SMA Riau. Bagaimana saya bisa membantu Anda hari ini?",
           },
         ]);
       } finally {
@@ -70,7 +70,7 @@ export default function ChatInterface() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3000/api/chat", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -137,8 +137,8 @@ export default function ChatInterface() {
               <div className="absolute inset-0 blur-xl bg-medical-400/50 rounded-full" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white">OTRIS AI Chat</h2>
-              <p className="text-sm text-medical-400">Asisten Pembelajaran Medis</p>
+              <h2 className="text-lg font-bold text-white">LACITA AI EDU Chat</h2>
+              <p className="text-sm text-medical-400">Asisten Belajar SMA Riau</p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -233,7 +233,7 @@ export default function ChatInterface() {
             <div className="flex-1 p-4 rounded-2xl bg-medical-800/50 border border-medical-700/50">
               <div className="flex items-center gap-3">
                 <Loader2 className="w-6 h-6 text-medical-400 animate-spin" />
-                <span className="text-medical-300">OTRIS AI sedang berpikir...</span>
+                <span className="text-medical-300">LACITA AI EDU sedang berpikir...</span>
               </div>
               <div className="mt-2 flex gap-1">
                 {[0, 1, 2].map((i) => (

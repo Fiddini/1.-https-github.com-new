@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LACITA AI EDU - RIAU LEARNING</title>
+<style>
+  body {
+    background: #1B2B4B;
+    color: #7FBFFF;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 20px;
+    height: 100vh;
+    margin: 0;
+  }
+  .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  svg {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+  }
+  .text-container {
+    display: flex;
+    flex-direction: column;
+  }
+  .title {
+    font-weight: 700;
+    font-size: 1.8rem;
+    color: #7FBFFF;
+    margin: 0;
+    letter-spacing: 1.5px;
+    line-height: 1.2;
+  }
+  .subtitle {
+    font-weight: 500;
+    font-size: 1.1rem;
+    color: #7FBFFF;
+    margin: 0;
+    letter-spacing: 3px;
+    opacity: 0.9;
+    line-height: 1.2;
+  }
+  @media (max-width: 600px) {
+    .title { font-size: 1.4rem; }
+    .subtitle { font-size: 1rem; letter-spacing: 2px; }
+    svg { width: 40px; height: 40px; }
+    .logo-container { gap: 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="logo-container">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#7FBFFF">
+    <circle cx="12" cy="4" r="2"/>
+    <circle cx="12" cy="20" r="2"/>
+    <circle cx="4" cy="12" r="2"/>
+    <circle cx="20" cy="12" r="2"/>
+    <circle cx="12" cy="12" r="2.5"/>
+    <line x1="12" y1="6" x2="12" y2="9.5" stroke="#7FBFFF" stroke-width="1.5"/>
+    <line x1="12" y1="14.5" x2="12" y2="18" stroke="#7FBFFF" stroke-width="1.5"/>
+    <line x1="6" y1="12" x2="9.5" y2="12" stroke="#7FBFFF" stroke-width="1.5"/>
+    <line x1="14.5" y1="12" x2="18" y2="12" stroke="#7FBFFF" stroke-width="1.5"/>
+  </svg>
+  <div class="text-container">
+    <h1 class="title">LACITA AI EDU</h1>
+    <p class="subtitle">RIAU LEARNING</p>
+  </div>
+</div>
+</body>
+</html>

@@ -30,7 +30,7 @@ if (!process.env.SUPABASE_URL.startsWith("https://")) {
 
 const app = express();
 app.use(cors({
-  origin: "http://localhost:5174",
+  origin: true, // Allow all origins for development with ngrok
   credentials: true,
 }));
 app.use(express.json());
@@ -48,7 +48,7 @@ const supabase = createClient(
 app.use("/api/slot", slotsRouter);
 
 const SYSTEM_PROMPT =
-  "Kamu OTRIS AI. Asisten anatomi SMA. Jawab singkat max 3 kalimat, bahasa santai.";
+  "Anda adalah LACITA AI EDU, asisten belajar untuk siswa SMA di Provinsi Riau. Jawab soal & jelaskan materi SMA dengan bahasa santai.";
 
 app.post("/api/chat", async (req, res) => {
   try {
@@ -103,7 +103,9 @@ app.post("/api/chat", async (req, res) => {
   } catch (error) {
     console.log("❌ ERROR API");
     console.log("Error message:", error.message);
-    res.status(500).json({ error: "Server OTRIS AI error" });
+    console.log("Error stack:", error.stack);
+    console.log("Full error:", error);
+    res.status(500).json({ error: "Server error: " + error.message });
   }
 });
 

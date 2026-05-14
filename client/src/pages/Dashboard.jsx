@@ -26,7 +26,7 @@ export default function Dashboard() {
       >
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Dashboard</h1>
-          <p className="text-medical-300">Selamat datang kembali di OTRIS AI</p>
+          <p className="text-medical-300">Selamat datang kembali di LACITA AI EDU</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.05 }}

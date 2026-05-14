@@ -57,9 +57,9 @@ export default function LandingPage({ onStartChat }) {
               transition={{ delay: 0.4 }}
               className="text-4xl md:text-5xl lg:text-7xl font-bold mb-6"
             >
-              <span className="text-gradient">OTRIS AI</span>
+              <span className="text-gradient">LACITA AI EDU</span>
               <br />
-              <span className="text-white">Asisten Pembelajaran Medis</span>
+              <span className="text-white">Asisten Belajar SMA Riau</span>
             </motion.h1>
 
             <motion.p
@@ -108,7 +108,7 @@ export default function LandingPage({ onStartChat }) {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-white mb-4">Mengapa OTRIS AI?</h2>
+            <h2 className="text-4xl font-bold text-white mb-4">Mengapa LACITA AI EDU?</h2>
             <p className="text-medical-300 text-lg max-w-2xl mx-auto">
               Fitur-fitur premium untuk pengalaman pembelajaran terbaik
             </p>
@@ -176,7 +176,7 @@ export default function LandingPage({ onStartChat }) {
             <h2 className="text-4xl font-bold text-white mb-4">Siap Memulai?</h2>
             <p className="text-medical-300 text-lg mb-8">
               Bergabunglah dengan ribuan pengguna lainnya dan rasakan kemudahan pembelajaran
-              medis dengan OTRIS AI
+              medis dengan LACITA AI EDU
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}

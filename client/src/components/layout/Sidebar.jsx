@@ -14,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
+import Logo from "../Logo";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", id: "dashboard" },
@@ -63,25 +64,7 @@ export default function Sidebar({ activeTab, setActiveTab }) {
       >
       {/* Logo */}
       <div className="p-6 flex items-center justify-between border-b border-medical-700/50">
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <Brain className="w-8 h-8 text-medical-400" />
-            <div className="absolute inset-0 blur-xl bg-medical-400/50 rounded-full" />
-          </div>
-          <AnimatePresence>
-            {!isCollapsed && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="flex flex-col"
-              >
-                <span className="text-xl font-bold text-gradient">OTRIS AI</span>
-                <span className="text-xs text-medical-400">Medical Learning</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+        <Logo />
         <button
           onClick={() => setIsMobileOpen(false)}
           className="lg:hidden p-2 hover:bg-medical-800/50 rounded-lg transition-colors"
