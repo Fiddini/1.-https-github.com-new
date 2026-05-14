@@ -1,6 +1,16 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Bot, User, Sparkles, Loader2, AlertCircle, RefreshCw } from "lucide-react";
+import { Send, Bot, User, Sparkles, Loader2, AlertCircle, RefreshCw, PlusCircle, Trash2 } from "lucide-react";
+
+// Generate or get session ID
+const getSessionId = () => {
+  let sessionId = localStorage.getItem('lacita_session_id');
+  if (!sessionId) {
+    sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('lacita_session_id', sessionId);
+  }
+  return sessionId;
+};
 
 export default function ChatInterface() {
   const [messages, setMessages] = useState([]);
@@ -9,6 +19,7 @@ export default function ChatInterface() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const [error, setError] = useState(null);
   const [mode, setMode] = useState("belajar");
+  const [sessionId] = useState(getSessionId());
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -23,7 +34,7 @@ export default function ChatInterface() {
   useEffect(() => {
     const loadHistory = async () => {
       try {
-        const response = await fetch("/api/history");
+        const response = await fetch(`/api/history?session_id=${sessionId}`);
         const data = await response.json();
         
         if (data.history && data.history.length > 0) {
@@ -75,7 +86,8 @@ export default function ChatInterface() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: [{ role: "user", content: userMessage }],
-          mode: mode
+          mode: mode,
+          session_id: sessionId
         }),
       });
 
@@ -119,6 +131,29 @@ export default function ChatInterface() {
     }
   };
 
+  const handleNewChat = () => {
+    setMessages([
+      {
+        role: "assistant",
+        content: "Halo! Saya LACITA AI EDU, teman belajar SMA Riau. Bagaimana saya bisa membantu Anda hari ini?",
+      },
+    ]);
+    setInput("");
+    setError(null);
+  };
+
+  const handleClearChat = async () => {
+    try {
+      await fetch(`/api/history/clear?session_id=${sessionId}`, {
+        method: "DELETE"
+      });
+      handleNewChat();
+    } catch (error) {
+      console.error("Error clearing chat:", error);
+      handleNewChat(); // Fallback to local clear
+    }
+  };
+
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -158,6 +193,27 @@ export default function ChatInterface() {
               </motion.button>
             ))}
           </div>
+        </div>
+        {/* Action Buttons */}
+        <div className="flex gap-2">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleNewChat}
+            className="px-4 py-2 rounded-lg font-medium transition-all bg-medical-600 text-white hover:bg-medical-500 flex items-center gap-2"
+          >
+            <PlusCircle className="w-4 h-4" />
+            <span className="text-sm">New Chat</span>
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleClearChat}
+            className="px-4 py-2 rounded-lg font-medium transition-all bg-red-600/30 text-red-300 hover:bg-red-600/50 flex items-center gap-2"
+          >
+            <Trash2 className="w-4 h-4" />
+            <span className="text-sm">Clear Chat</span>
+          </motion.button>
         </div>
       </div>
 

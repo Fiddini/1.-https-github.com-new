@@ -52,12 +52,14 @@ const SYSTEM_PROMPT =
 
 app.post("/api/chat", async (req, res) => {
   try {
-    console.log("🔥 CHAT ENDPOINT CALLED");
-    const { messages } = req.body;
+    const { messages, session_id } = req.body;
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      console.log("❌ ERROR: Messages tidak valid");
       return res.status(400).json({ error: "messages wajib diisi sebagai array" });
+    }
+
+    if (!session_id) {
+      return res.status(400).json({ error: "session_id wajib diisi" });
     }
 
     const userMessage = messages[messages.length - 1].content;
@@ -77,12 +79,12 @@ app.post("/api/chat", async (req, res) => {
 
     const aiReply = completion.choices[0]?.message?.content || "Maaf, AI gak jawab.";
 
-    // Simpan ke table chats
+    // Simpan ke table chats dengan session_id
     const { error: insertError } = await supabase.from("chats").insert({
-      message: userMessage,
-      mode: mode,
+      session_id: session_id,
       user_message: userMessage,
       ai_reply: aiReply,
+      mode: mode,
     });
 
     if (insertError) {
@@ -98,12 +100,16 @@ app.post("/api/chat", async (req, res) => {
 
 app.get("/api/history", async (req, res) => {
   try {
-    console.log("=== GET HISTORY ===");
-    console.log("Timestamp:", new Date().toISOString());
+    const { session_id } = req.query;
+
+    if (!session_id) {
+      return res.status(400).json({ error: "session_id wajib diisi" });
+    }
 
     const { data, error } = await supabase
       .from("chats")
       .select("*")
+      .eq("session_id", session_id)
       .order("created_at", { ascending: false })
       .limit(20);
 
@@ -115,6 +121,31 @@ app.get("/api/history", async (req, res) => {
     res.json({ history: data || [] });
   } catch (error) {
     console.error("History error:", error.message);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.delete("/api/history/clear", async (req, res) => {
+  try {
+    const { session_id } = req.query;
+
+    if (!session_id) {
+      return res.status(400).json({ error: "session_id wajib diisi" });
+    }
+
+    const { error } = await supabase
+      .from("chats")
+      .delete()
+      .eq("session_id", session_id);
+
+    if (error) {
+      console.error("Clear chat error:", error.message);
+      return res.status(500).json({ error: error.message });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Clear chat error:", error.message);
     res.status(500).json({ error: "Server error" });
   }
 });
