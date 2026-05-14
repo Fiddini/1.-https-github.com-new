@@ -2,14 +2,25 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, Bot, User, Sparkles, Loader2, AlertCircle, RefreshCw, PlusCircle, Trash2 } from "lucide-react";
 
-// Generate or get session ID
+// Generate or get session ID with fallback
 const getSessionId = () => {
-  let sessionId = localStorage.getItem('lacita_session_id');
-  if (!sessionId) {
+  try {
+    let sessionId = localStorage.getItem('lacita_session_id');
+    
+    // Validate existing session ID
+    if (sessionId && sessionId.startsWith('session_') && sessionId.length > 10) {
+      return sessionId;
+    }
+    
+    // Generate new session ID
     sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     localStorage.setItem('lacita_session_id', sessionId);
+    return sessionId;
+  } catch (error) {
+    // Fallback: generate session without localStorage
+    console.error('Session generation error, using fallback:', error);
+    return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
   }
-  return sessionId;
 };
 
 export default function ChatInterface() {
@@ -29,6 +40,14 @@ export default function ChatInterface() {
   useEffect(() => {
     scrollToBottom();
   }, [messages, error]);
+
+  // Validate and regenerate session on mount if needed
+  useEffect(() => {
+    const validSessionId = getSessionId();
+    if (validSessionId !== sessionId) {
+      setSessionId(validSessionId);
+    }
+  }, []);
 
   // Load history from Supabase on mount
   useEffect(() => {
@@ -132,6 +151,11 @@ export default function ChatInterface() {
   };
 
   const handleNewChat = () => {
+    // Generate new session ID for complete isolation
+    const newSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('lacita_session_id', newSessionId);
+    setSessionId(newSessionId);
+    
     setMessages([
       {
         role: "assistant",
