@@ -1,0 +1,8 @@
+{
+  "name": "otris-ai-backend-runner",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "cd .. && npm run dev"
+  }
+}

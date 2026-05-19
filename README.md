@@ -30,6 +30,7 @@ Asisten Pembelajaran AI untuk Siswa SMA di Provinsi Riau
 ### 1. Install Dependencies
 ```bash
 npm install
+(cd client && npm install)
 ```
 
 ### 2. Environment Configuration
@@ -40,10 +41,11 @@ cp .env.example .env
 
 Edit `.env`:
 ```env
-GROQ_API_KEY=your_groq_api_key_here
-OPENAI_API_KEY=your_openai_api_key_here
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_KEY=your_supabase_anon_key_here
+GROQ_API_KEY=
+OPENAI_API_KEY=
+SUPABASE_URL=
+SUPABASE_ANON_KEY=
+PORT=3000
 ```
 
 ### 3. Database Setup
@@ -61,11 +63,44 @@ CREATE INDEX IF NOT EXISTS idx_chats_user_id ON chats(user_id);
 
 ## 🏃 Cara Run
 
+## Run Lokal di VS Code
+
+1. Install dependencies:
+```bash
+npm install
+(cd client && npm install)
+```
+
+2. Copy environment template:
+```bash
+cp .env.example .env
+```
+
+3. Isi `.env` tanpa hardcode key di source code:
+```env
+GROQ_API_KEY=your_groq_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your_supabase_anon_key_here
+PORT=3000
+```
+
+4. Jalankan backend, client, dan ngrok:
+```bash
+npm run dev:all
+```
+
+Catatan:
+- `dev:backend` menjalankan backend Express di `http://localhost:3000`.
+- `dev:client` menjalankan Vite di `http://localhost:5173`.
+- `dev:ngrok` menjalankan `ngrok http 3000`.
+- Backend tetap mencoba Groq dulu; kalau Groq `401`, backend log `Groq invalid, using OpenAI` dan lanjut memakai `OPENAI_API_KEY`.
+
 ### Development Mode
 
 **Terminal 1 - Backend:**
 ```bash
-node server.js
+npm run dev
 # Backend runs on http://localhost:3000
 ```
 
@@ -165,6 +200,7 @@ otris-ai-backend/
 │   │   └── pages/         # Page components
 │   ├── vite.config.js     # Vite configuration
 │   └── package.json       # Frontend dependencies
+├── backend/                # npm run dev wrapper for root backend
 ├── routes/                # API routes
 │   └── slots.js          # Slot booking routes
 ├── backup/               # Project backups

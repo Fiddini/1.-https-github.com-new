@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const supabaseUrl = process.env.SUPABASE_URL?.trim();
-const supabaseKey = process.env.SUPABASE_KEY?.trim();
+const supabaseKey = (process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_KEY)?.trim();
 
 const router = express.Router();
 const supabase =

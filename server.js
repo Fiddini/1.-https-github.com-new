@@ -11,7 +11,7 @@ const config = {
   groqApiKey: process.env.GROQ_API_KEY?.trim(),
   openaiApiKey: process.env.OPENAI_API_KEY?.trim(),
   supabaseUrl: process.env.SUPABASE_URL?.trim(),
-  supabaseKey: process.env.SUPABASE_KEY?.trim(),
+  supabaseKey: (process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_KEY)?.trim(),
 };
 
 const missingEnv = Object.entries(config)
@@ -136,6 +136,10 @@ const getAiReply = async (messages) => {
         return { reply: FALLBACK_REPLY, provider: "fallback" };
       }
 
+      const status = error?.status || error?.code || error?.response?.status;
+      if (status === 401) {
+        console.warn("Groq invalid, using OpenAI");
+      }
       console.warn("Groq failed, falling back to OpenAI");
     }
   } else {
@@ -288,6 +292,8 @@ app.delete("/api/history/clear", async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log("OTRIS AI backend jalan di http://localhost:3000");
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => {
+  console.log(`OTRIS AI backend jalan di http://localhost:${port}`);
 });
