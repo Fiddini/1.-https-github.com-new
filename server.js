@@ -7,25 +7,27 @@ import slotsRouter from "./routes/slots.js";
 
 dotenv.config();
 
-// Validate environment variables
-if (!process.env.GROQ_API_KEY) {
-  console.error("❌ ERROR: GROQ_API_KEY tidak ditemukan di .env");
-  process.exit(1);
+const config = {
+  groqApiKey: process.env.GROQ_API_KEY?.trim(),
+  supabaseUrl: process.env.SUPABASE_URL?.trim(),
+  supabaseKey: process.env.SUPABASE_KEY?.trim(),
+};
+
+const missingEnv = Object.entries(config)
+  .filter(([, value]) => !value)
+  .map(([key]) => key);
+
+if (missingEnv.length > 0) {
+  console.warn(`⚠️ Missing environment: ${missingEnv.join(", ")}. Backend running in degraded mode.`);
 }
 
-if (!process.env.SUPABASE_URL) {
-  console.error("❌ ERROR: SUPABASE_URL tidak ditemukan di .env");
-  process.exit(1);
-}
+const isSupabaseConfigured =
+  Boolean(config.supabaseUrl) &&
+  config.supabaseUrl.startsWith("https://") &&
+  Boolean(config.supabaseKey);
 
-if (!process.env.SUPABASE_KEY) {
-  console.error("❌ ERROR: SUPABASE_KEY tidak ditemukan di .env");
-  process.exit(1);
-}
-
-if (!process.env.SUPABASE_URL.startsWith("https://")) {
-  console.error("❌ ERROR: SUPABASE_URL harus dimulai dengan https://");
-  process.exit(1);
+if (config.supabaseUrl && !config.supabaseUrl.startsWith("https://")) {
+  console.warn("⚠️ SUPABASE_URL harus dimulai dengan https://. Supabase disabled.");
 }
 
 const app = express();
@@ -35,14 +37,11 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Setup Groq client
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const groq = config.groqApiKey ? new Groq({ apiKey: config.groqApiKey }) : null;
 
-// Setup Supabase client
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
+const supabase = isSupabaseConfigured
+  ? createClient(config.supabaseUrl, config.supabaseKey)
+  : null;
 
 // Import routes
 app.use("/api/slot", slotsRouter);
@@ -50,9 +49,23 @@ app.use("/api/slot", slotsRouter);
 const SYSTEM_PROMPT =
   "Anda adalah LACITA AI EDU, asisten belajar untuk siswa SMA di Provinsi Riau. Jawab soal & jelaskan materi SMA dengan bahasa santai.";
 
+const FALLBACK_REPLY =
+  "Maaf, layanan AI sedang tidak bisa dihubungi. Saya tetap siap membantu; coba lagi sebentar lagi atau periksa konfigurasi API.";
+
+app.get("/api/status", (req, res) => {
+  res.json({
+    status: "ok",
+    services: {
+      groq: Boolean(groq),
+      supabase: Boolean(supabase),
+    },
+    fallback: !groq || !supabase,
+  });
+});
+
 app.post("/api/chat", async (req, res) => {
   try {
-    const { messages, session_id } = req.body;
+    const { messages, session_id, mode = "belajar" } = req.body;
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({ error: "messages wajib diisi sebagai array" });
@@ -62,39 +75,63 @@ app.post("/api/chat", async (req, res) => {
       return res.status(400).json({ error: "session_id wajib diisi" });
     }
 
-    const userMessage = messages[messages.length - 1].content;
-    const mode = "belajar";
+    const userMessage = messages[messages.length - 1]?.content;
 
-    // Minimal logging for production
-    console.log(`[${new Date().toISOString()}] Chat request: ${userMessage.substring(0, 50)}...`);
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      max_tokens: 200,
-      temperature: 0.7,
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        ...messages,
-      ],
-    });
-
-    const aiReply = completion.choices[0]?.message?.content || "Maaf, AI gak jawab.";
-
-    // Simpan ke table chats dengan session_id
-    const { error: insertError } = await supabase.from("chats").insert({
-      session_id: session_id,
-      user_message: userMessage,
-      ai_reply: aiReply,
-      mode: mode,
-    });
-
-    if (insertError) {
-      console.error("Error saving chat:", insertError.message);
+    if (typeof userMessage !== "string" || !userMessage.trim()) {
+      return res.status(400).json({ error: "pesan terakhir wajib berupa teks" });
     }
 
-    res.json({ reply: aiReply });
+    console.log(`[${new Date().toISOString()}] Chat request: ${userMessage.substring(0, 50)}...`);
+
+    let aiReply = FALLBACK_REPLY;
+    let fallback = false;
+
+    if (!groq) {
+      fallback = true;
+      console.warn("Groq client disabled: GROQ_API_KEY missing.");
+    } else {
+      try {
+        const completion = await groq.chat.completions.create({
+          model: "llama-3.3-70b-versatile",
+          max_tokens: 200,
+          temperature: 0.7,
+          messages: [
+            { role: "system", content: SYSTEM_PROMPT },
+            ...messages,
+          ],
+        });
+
+        aiReply = completion.choices[0]?.message?.content || FALLBACK_REPLY;
+        fallback = aiReply === FALLBACK_REPLY;
+      } catch (error) {
+        fallback = true;
+        console.error("Groq API error:", error.message);
+      }
+    }
+
+    if (supabase) {
+      try {
+        const { error: insertError } = await supabase.from("chats").insert({
+          session_id,
+          user_message: userMessage,
+          ai_reply: aiReply,
+          mode,
+        });
+
+        if (insertError) {
+          console.error("Error saving chat:", insertError.message);
+        }
+      } catch (error) {
+        console.error("Error saving chat:", error.message);
+      }
+    } else {
+      console.warn("Supabase disabled: chat not saved.");
+    }
+
+    res.json({ reply: aiReply, fallback });
   } catch (error) {
     console.error("API Error:", error.message);
-    res.status(500).json({ error: "Server error" });
+    res.json({ reply: FALLBACK_REPLY, fallback: true });
   }
 });
 
@@ -106,6 +143,10 @@ app.get("/api/history", async (req, res) => {
       return res.status(400).json({ error: "session_id wajib diisi" });
     }
 
+    if (!supabase) {
+      return res.json({ history: [], fallback: true });
+    }
+
     const { data, error } = await supabase
       .from("chats")
       .select("*")
@@ -115,13 +156,13 @@ app.get("/api/history", async (req, res) => {
 
     if (error) {
       console.error("History error:", error.message);
-      return res.status(500).json({ error: error.message });
+      return res.json({ history: [], fallback: true });
     }
 
-    res.json({ history: data || [] });
+    res.json({ history: (data || []).slice().reverse() });
   } catch (error) {
     console.error("History error:", error.message);
-    res.status(500).json({ error: "Server error" });
+    res.json({ history: [], fallback: true });
   }
 });
 
@@ -133,6 +174,10 @@ app.delete("/api/history/clear", async (req, res) => {
       return res.status(400).json({ error: "session_id wajib diisi" });
     }
 
+    if (!supabase) {
+      return res.json({ success: true, fallback: true });
+    }
+
     const { error } = await supabase
       .from("chats")
       .delete()
@@ -140,13 +185,13 @@ app.delete("/api/history/clear", async (req, res) => {
 
     if (error) {
       console.error("Clear chat error:", error.message);
-      return res.status(500).json({ error: error.message });
+      return res.json({ success: false, fallback: true });
     }
 
     res.json({ success: true });
   } catch (error) {
     console.error("Clear chat error:", error.message);
-    res.status(500).json({ error: "Server error" });
+    res.json({ success: false, fallback: true });
   }
 });
 
