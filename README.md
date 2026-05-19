@@ -10,7 +10,7 @@ Asisten Pembelajaran AI untuk Siswa SMA di Provinsi Riau
 ## 🚀 Tech Stack
 - **Frontend:** React + Vite
 - **Backend:** Express.js
-- **AI Model:** Groq llama-3.3-70b-versatile
+- **AI Model:** Groq llama-3.3-70b-versatile primary, OpenAI gpt-4o-mini fallback
 - **Database:** Supabase PostgreSQL
 - **Deployment:** Ngrok HTTPS Tunnel
 
@@ -20,6 +20,7 @@ Asisten Pembelajaran AI untuk Siswa SMA di Provinsi Riau
 - Node.js 18+ 
 - npm/yarn
 - Groq API Key (https://console.groq.com)
+- OpenAI API Key (https://platform.openai.com/api-keys)
 - Supabase Project (https://supabase.com)
 
 ---
@@ -40,6 +41,7 @@ cp .env.example .env
 Edit `.env`:
 ```env
 GROQ_API_KEY=your_groq_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your_supabase_anon_key_here
 ```
