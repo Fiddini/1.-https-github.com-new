@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Brain, MessageSquare, BookOpen, FileText, TrendingUp, Clock, Star, ArrowRight } from "lucide-react";
+import { Brain, MessageSquare, BookOpen, FileText, TrendingUp, Clock, ArrowRight } from "lucide-react";
 
 export default function Dashboard() {
   const stats = [

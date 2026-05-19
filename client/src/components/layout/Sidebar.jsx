@@ -8,7 +8,6 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Brain,
   Activity,
   Menu,
   X,

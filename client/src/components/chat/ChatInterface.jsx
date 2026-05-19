@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Bot, User, Sparkles, Loader2, AlertCircle, RefreshCw, PlusCircle, Trash2 } from "lucide-react";
+import { Bot, User, Sparkles, Loader2, AlertCircle, RefreshCw, PlusCircle, Trash2 } from "lucide-react";
+
+const WELCOME_MESSAGE =
+  "Halo! Saya LACITA AI EDU, teman belajar SMA Riau. Bagaimana saya bisa membantu Anda hari ini?";
 
 // Generate or get session ID with fallback
 const getSessionId = () => {
@@ -23,6 +26,13 @@ const getSessionId = () => {
   }
 };
 
+const getWelcomeMessages = () => [
+  {
+    role: "assistant",
+    content: WELCOME_MESSAGE,
+  },
+];
+
 export default function ChatInterface() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -30,7 +40,7 @@ export default function ChatInterface() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const [error, setError] = useState(null);
   const [mode, setMode] = useState("belajar");
-  const [sessionId] = useState(getSessionId());
+  const [sessionId, setSessionId] = useState(getSessionId());
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -41,20 +51,12 @@ export default function ChatInterface() {
     scrollToBottom();
   }, [messages, error]);
 
-  // Validate and regenerate session on mount if needed
-  useEffect(() => {
-    const validSessionId = getSessionId();
-    if (validSessionId !== sessionId) {
-      setSessionId(validSessionId);
-    }
-  }, []);
-
   // Load history from Supabase on mount
   useEffect(() => {
     const loadHistory = async () => {
       try {
-        const response = await fetch(`/api/history?session_id=${sessionId}`);
-        const data = await response.json();
+        const response = await fetch(`/api/history?session_id=${encodeURIComponent(sessionId)}`);
+        const data = response.ok ? await response.json() : { history: [] };
         
         if (data.history && data.history.length > 0) {
           // Convert Supabase format to messages format
@@ -64,29 +66,18 @@ export default function ChatInterface() {
           ]);
           setMessages(historyMessages);
         } else {
-          // Default welcome message if no history
-          setMessages([
-            {
-              role: "assistant",
-              content: "Halo! Saya LACITA AI EDU, teman belajar SMA Riau. Bagaimana saya bisa membantu Anda hari ini?",
-            },
-          ]);
+          setMessages(getWelcomeMessages());
         }
       } catch (error) {
         console.error("Error loading history:", error);
-        setMessages([
-          {
-            role: "assistant",
-            content: "Halo! Saya LACITA AI EDU, teman belajar SMA Riau. Bagaimana saya bisa membantu Anda hari ini?",
-          },
-        ]);
+        setMessages(getWelcomeMessages());
       } finally {
         setIsLoadingHistory(false);
       }
     };
 
     loadHistory();
-  }, []);
+  }, [sessionId]);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -124,7 +115,13 @@ export default function ChatInterface() {
         throw new Error("Tidak ada respon dari server");
       }
 
-      setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: data.fallback ? "warning" : "assistant",
+          content: data.reply,
+        },
+      ]);
     } catch (error) {
       console.error("Chat error:", error);
       setError(error.message);
@@ -156,19 +153,14 @@ export default function ChatInterface() {
     localStorage.setItem('lacita_session_id', newSessionId);
     setSessionId(newSessionId);
     
-    setMessages([
-      {
-        role: "assistant",
-        content: "Halo! Saya LACITA AI EDU, teman belajar SMA Riau. Bagaimana saya bisa membantu Anda hari ini?",
-      },
-    ]);
+    setMessages(getWelcomeMessages());
     setInput("");
     setError(null);
   };
 
   const handleClearChat = async () => {
     try {
-      await fetch(`/api/history/clear?session_id=${sessionId}`, {
+      await fetch(`/api/history/clear?session_id=${encodeURIComponent(sessionId)}`, {
         method: "DELETE"
       });
       handleNewChat();
@@ -262,14 +254,14 @@ export default function ChatInterface() {
                   className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
                     message.role === "user"
                       ? "bg-accent-500/20 border border-accent-500/50"
-                      : message.role === "error"
+                      : message.role === "error" || message.role === "warning"
                       ? "bg-red-500/20 border border-red-500/50"
                       : "bg-medical-500/20 border border-medical-500/50"
                   }`}
                 >
                   {message.role === "user" ? (
                     <User className="w-5 h-5 text-accent-400" />
-                  ) : message.role === "error" ? (
+                  ) : message.role === "error" || message.role === "warning" ? (
                     <AlertCircle className="w-5 h-5 text-red-400" />
                   ) : (
                     <Bot className="w-5 h-5 text-medical-400" />
@@ -279,7 +271,7 @@ export default function ChatInterface() {
                   className={`flex-1 max-w-2xl p-4 rounded-2xl ${
                     message.role === "user"
                       ? "bg-accent-500/20 border border-accent-500/50"
-                      : message.role === "error"
+                      : message.role === "error" || message.role === "warning"
                       ? "bg-red-500/20 border border-red-500/50"
                       : "bg-medical-800/50 border border-medical-700/50"
                   }`}

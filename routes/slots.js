@@ -4,11 +4,14 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const supabaseUrl = process.env.SUPABASE_URL?.trim();
+const supabaseKey = (process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_KEY)?.trim();
+
 const router = express.Router();
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
+const supabase =
+  supabaseUrl?.startsWith("https://") && supabaseKey
+    ? createClient(supabaseUrl, supabaseKey)
+    : null;
 
 // Default 4 slot kalo room baru
 const defaultSlots = {
@@ -51,6 +54,10 @@ router.get("/:room_id", async (req, res) => {
   try {
     const { room_id } = req.params;
 
+    if (!supabase) {
+      return res.json({ room_id, ...defaultSlots, fallback: true });
+    }
+
     const { data, error } = await supabase
       .from("rooms")
       .select("*")
@@ -80,6 +87,14 @@ router.post("/update", async (req, res) => {
       stream_id,
       is_primary,
     } = req.body;
+
+    if (!supabase) {
+      return res.json({
+        success: false,
+        fallback: true,
+        error: "Supabase belum dikonfigurasi",
+      });
+    }
 
     // Ambil data room sekarang
     let { data: room } = await supabase

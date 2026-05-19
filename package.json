@@ -5,7 +5,13 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node --test test/*.test.js",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:client": "npm run dev --prefix client",
+    "dev:ngrok": "ngrok http 3000",
+    "dev:all": "concurrently \"npm:dev:backend\" \"npm:dev:client\" \"npm:dev:ngrok\""
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.4",
@@ -14,5 +20,8 @@
     "express": "^5.2.1",
     "groq-sdk": "^1.2.0",
     "openai": "^6.36.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
   }
 }
