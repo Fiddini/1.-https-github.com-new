@@ -113,6 +113,7 @@ app.post("/api/chat", async (req, res) => {
       try {
         const { error: insertError } = await supabase.from("chats").insert({
           session_id,
+          message: userMessage,
           user_message: userMessage,
           ai_reply: aiReply,
           mode,
